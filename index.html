@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do Plus</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ===================== HEADER ===================== -->
+<header class="header">
+  <div class="logo">To-Do Plus</div>
+
+  <div class="header-center" id="header-badges"></div>
+
+  <div class="header-actions">
+    <button class="btn btn-ghost btn-sm" id="brain-dump-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 1 5 5c0 1.7-.84 3.2-2.13 4.12A5 5 0 0 1 17 16H7a5 5 0 0 1 2.13-4.88A5 5 0 0 1 7 7a5 5 0 0 1 5-5z"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="9" y1="19" x2="15" y2="19"/></svg>
+      <span class="label">Brain Dump</span>
+    </button>
+    <button class="btn btn-ghost btn-sm" id="focus-mode-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      <span class="label">Focus</span>
+    </button>
+    <button class="btn btn-primary btn-sm" id="add-task-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      <span>Add Task</span>
+    </button>
+    <button class="btn-icon" id="settings-btn" title="Settings">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ===================== MAIN ===================== -->
+<main class="container">
+
+  <div class="today-progress" id="today-progress">
+    <div style="font-size:0.82rem;color:var(--text-muted);white-space:nowrap" id="progress-label">Ready to go!</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+    </div>
+    <div class="progress-text" id="progress-pct">0%</div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-group">
+      <button class="filter-btn active" data-filter="view" data-value="all">All</button>
+      <button class="filter-btn" data-filter="view" data-value="today" id="today-filter-btn">Today</button>
+      <button class="filter-btn" data-filter="view" data-value="overdue" id="overdue-filter-btn">Overdue</button>
+      <button class="filter-btn" data-filter="view" data-value="completed">Done</button>
+    </div>
+    <div class="filter-group">
+      <button class="filter-btn active" data-filter="priority" data-value="">All</button>
+      <button class="filter-btn" data-filter="priority" data-value="high" style="color:var(--high)">High</button>
+      <button class="filter-btn" data-filter="priority" data-value="medium" style="color:var(--medium)">Med</button>
+      <button class="filter-btn" data-filter="priority" data-value="low" style="color:var(--low)">Low</button>
+    </div>
+    <div id="category-filters" class="filter-group"></div>
+  </div>
+
+  <div class="tasks-header">
+    <span class="tasks-title" id="tasks-title">All Tasks</span>
+    <span style="font-size:0.78rem;color:var(--text-muted)" id="tasks-count"></span>
+  </div>
+
+  <div class="task-list" id="task-list"></div>
+
+  <div class="shortcuts-footer">
+    <span><kbd>N</kbd> New task</span>
+    <span><kbd>B</kbd> Brain Dump</span>
+    <span><kbd>F</kbd> Focus Mode</span>
+    <span><kbd>Esc</kbd> Close</span>
+  </div>
+
+</main>
+
+<!-- ===================== ADD/EDIT TASK MODAL ===================== -->
+<div class="modal-overlay" id="task-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="task-modal-title">New Task</h2>
+      <button class="btn-icon" id="close-task-modal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">What needs to get done?</label>
+      <input class="form-input" type="text" id="task-title-input" placeholder="e.g. Call dentist to schedule cleaning" autocomplete="off" />
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+      <div class="form-group">
+        <label class="form-label">Due Date</label>
+        <input class="form-input" type="date" id="task-due-input" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <input class="form-input" type="text" id="task-category-input" placeholder="Work, Home, Health..." autocomplete="off" />
+        <div class="category-suggestions" id="category-suggestions"></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Priority</label>
+      <div class="radio-group">
+        <div class="radio-option radio-priority-high">
+          <input type="radio" name="priority" id="p-high" value="high" />
+          <label for="p-high">High<br><small>Urgent</small></label>
+        </div>
+        <div class="radio-option radio-priority-medium">
+          <input type="radio" name="priority" id="p-medium" value="medium" checked />
+          <label for="p-medium">Medium<br><small>Normal</small></label>
+        </div>
+        <div class="radio-option radio-priority-low">
+          <input type="radio" name="priority" id="p-low" value="low" />
+          <label for="p-low">Low<br><small>Someday</small></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">How long will this take?</label>
+      <div class="radio-group">
+        <div class="radio-option radio-size-quick">
+          <input type="radio" name="size" id="s-quick" value="quick" checked />
+          <label for="s-quick">Quick<small style="display:block">&lt;15 min</small></label>
+        </div>
+        <div class="radio-option radio-size-medium">
+          <input type="radio" name="size" id="s-medium" value="medium" />
+          <label for="s-medium">Medium<small style="display:block">~1 hour</small></label>
+        </div>
+        <div class="radio-option radio-size-big">
+          <input type="radio" name="size" id="s-big" value="big" />
+          <label for="s-big">Big<small style="display:block">1hr+</small></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Notes <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <textarea class="form-input form-textarea" id="task-notes-input" placeholder="Extra details, context, links..."></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancel-task-modal">Cancel</button>
+      <button class="btn btn-primary" id="save-task-btn">Save Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== BRAIN DUMP MODAL ===================== -->
+<div class="modal-overlay" id="brain-dump-modal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title">Brain Dump</h2>
+        <p class="modal-subtitle">Type or speak everything on your mind — AI will sort it into tasks.</p>
+      </div>
+      <button class="btn-icon" id="close-brain-dump">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="brain-dump-area">
+      <textarea class="form-input form-textarea brain-dump-textarea" id="brain-dump-text"
+        placeholder="Just type... e.g. &quot;I need to call the dentist, finish the project proposal by Friday, pick up groceries, and remember to email Sarah about the meeting next week...&quot;"></textarea>
+      <button class="mic-btn" id="mic-btn" title="Click to speak your thoughts">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
+    </div>
+
+    <div id="ai-status" style="display:none;margin-top:1rem;text-align:center;color:var(--text-muted);font-size:0.83rem;display:none;align-items:center;justify-content:center;gap:0.5rem">
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+      Turning your thoughts into tasks...
+    </div>
+
+    <div id="ai-tasks-result" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;margin-bottom:0.5rem">
+        <span style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em">Suggested Tasks</span>
+        <button class="btn btn-ghost btn-sm" id="select-all-ai-tasks">Select All</button>
+      </div>
+      <div class="ai-tasks-preview" id="ai-tasks-list"></div>
+    </div>
+
+    <div id="api-key-section" style="display:none" class="api-key-notice">
+      <strong>Set up AI (one time)</strong>
+      To turn your brain dump into tasks automatically, you'll need a free OpenAI API key.
+      <div style="display:flex;gap:0.5rem;margin-top:0.75rem;align-items:center">
+        <input class="form-input" type="password" id="api-key-input" placeholder="Paste your key here (starts with sk-...)" style="flex:1" />
+        <button class="btn btn-primary btn-sm" id="save-api-key-btn">Save</button>
+      </div>
+      <p style="margin-top:0.5rem;font-size:0.75rem">Get one at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--accent)">platform.openai.com/api-keys</a>. Your key stays on your device only — never shared.</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancel-brain-dump">Cancel</button>
+      <button class="btn btn-primary" id="analyze-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Turn into Tasks with AI
+      </button>
+      <button class="btn btn-primary" id="add-ai-tasks-btn" style="display:none">Add Selected Tasks</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SETTINGS MODAL ===================== -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal settings-modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Settings</h2>
+      <button class="btn-icon" id="close-settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">OpenAI API Key</label>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.5rem">Powers the AI Brain Dump feature. Stored only in your browser.</p>
+      <div style="display:flex;gap:0.5rem">
+        <input class="form-input" type="password" id="settings-api-key" placeholder="sk-..." style="flex:1" />
+        <button class="btn btn-primary btn-sm" id="settings-save-key">Save</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="form-group">
+      <label class="form-label">My Categories</label>
+      <div id="settings-categories" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.65rem"></div>
+      <div style="display:flex;gap:0.5rem">
+        <input class="form-input" type="text" id="new-category-input" placeholder="Add a category..." style="flex:1" />
+        <button class="btn btn-ghost btn-sm" id="add-category-btn">Add</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="form-group">
+      <label class="form-label">Manage Tasks</label>
+      <div style="display:flex;flex-direction:column;gap:0.4rem">
+        <button class="btn btn-ghost" id="clear-completed-btn" style="justify-content:flex-start">Remove all completed tasks</button>
+        <button class="btn btn-ghost" id="clear-all-btn" style="justify-content:flex-start;color:var(--danger);border-color:rgba(255,107,107,0.3)">Clear everything &amp; start fresh</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FOCUS MODE ===================== -->
+<div class="focus-overlay" id="focus-overlay">
+  <button class="btn btn-ghost focus-exit btn-sm" id="exit-focus-btn">Exit Focus Mode</button>
+
+  <div class="focus-eyebrow" id="focus-eyebrow">Focus Mode</div>
+
+  <div class="focus-card" id="focus-card">
+    <div class="focus-priority-dot" id="focus-priority-dot"></div>
+    <div class="focus-title" id="focus-title">No tasks</div>
+    <div class="focus-meta" id="focus-meta"></div>
+    <div class="focus-notes" id="focus-notes" style="display:none"></div>
+    <div class="focus-actions">
+      <button class="btn btn-primary" id="focus-complete-btn">Mark Complete</button>
+      <button class="btn btn-ghost" id="focus-skip-btn">Skip for Now</button>
+    </div>
+  </div>
+
+  <div class="focus-nav">
+    <button class="btn-icon" id="focus-prev-btn">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <span id="focus-counter" style="min-width:4rem;text-align:center">0 / 0</span>
+    <button class="btn-icon" id="focus-next-btn">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ===================== APP LOGIC ===================== -->
+<script type="module" src="/main.js"></script>
+
+</body>
+</html>
