@@ -66,7 +66,7 @@ function formatDate(dateStr) {
   };
 }
 
-const CAT_COLORS = ['#7c6aff','#f783ac','#74c0fc','#69db7c','#ffa94d','#da77f2','#4dabf7','#a9e34b','#ff8787','#63e6be'];
+const CAT_COLORS = ['#2e7d52','#c94444','#c8943a','#5a8fad','#a86b7a','#5a9e6c','#7a6340','#3d7291','#8f5264','#6b8f5a'];
 function catColor(cat) {
   let h = 0;
   for (const c of (cat || '')) h = c.charCodeAt(0) + ((h << 5) - h);
@@ -918,7 +918,7 @@ resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
 function spawnParticles(x, y, count) {
-  const colors = ['#7c6aff','#69db7c','#ffa94d','#74c0fc','#f783ac','#51cf66','#fff'];
+  const colors = ['#2e7d52','#c94444','#c8943a','#5a8fad','#5a9e6c','#a86b7a','#e2e8e4'];
   for (let i = 0; i < count; i++) {
     particles.push({
       x, y,
@@ -1039,9 +1039,30 @@ function addSampleTasks() {
 }
 
 // ======================================================
+// THEME TOGGLE
+// ======================================================
+
+function getPreferredTheme() {
+  const saved = localStorage.getItem('todoplus_theme');
+  if (saved) return saved;
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('todoplus_theme', theme);
+}
+
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+// ======================================================
 // INIT
 // ======================================================
 
+applyTheme(getPreferredTheme());
 loadState();
 if (state.tasks.length === 0) addSampleTasks();
 initSpeech();
